@@ -15,7 +15,7 @@ public class MyDodo extends Dodo
     }
 
     public void act() {
-        eggTrailToNest();
+        mazeSolver();
     }
 
     /**
@@ -253,8 +253,24 @@ public class MyDodo extends Dodo
                     }
                 }
             } 
-
         }
+    }
+
+    public void mazeSolver(){
+        while (!onNest())   {
+            turnLeft();
+            if (!fenceAhead()){
+                move();
+            } else{
+                turnRight();
+                if (!fenceAhead()){
+                    move();
+                } else {
+                    turn180();
+                }
+            }
+        }
+        showCompliment("gg maze done!");
     }
 }
 
