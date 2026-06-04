@@ -15,7 +15,7 @@ public class MyDodo extends Dodo
     }
 
     public void act() {
-        walkAroundFencedArea();
+        eggTrailToNest();
     }
 
     /**
@@ -218,5 +218,43 @@ public class MyDodo extends Dodo
             layEgg();
         }
     }
-} 
+
+    public void walkAroundFencedArea(){
+        while (!onEgg()){
+            if (fenceAhead()){
+                turnLeft();
+            } 
+            else{
+                move();
+                if (!fenceAhead()){
+                    turnRight();
+                }
+            }
+        }
+    }
+
+    public void eggTrailToNest(){
+        while(!onNest()){
+            if(eggAhead() || nestAhead()){
+                move();
+            } else{
+                turnLeft();
+                if(eggAhead() || nestAhead()){
+                    move();
+                } else {
+                    turn180();
+                    if(eggAhead() || nestAhead()){
+                        move();
+                    } else {
+                        turnLeft();
+                        if(eggAhead() || nestAhead()){
+                            move();
+                        }
+                    }
+                }
+            } 
+
+        }
+    }
+}
 
