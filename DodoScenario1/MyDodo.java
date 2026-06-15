@@ -1,4 +1,5 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+import java.util.Scanner;
 
 /**
  *
@@ -8,14 +9,25 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 public class MyDodo extends Dodo
 {
     private int myNrOfEggsHatched;
+    private int waardeBlauweEi;
+    private int waardeGoudenEi;
 
     public MyDodo() {
         super( EAST );
         myNrOfEggsHatched = 0;
+        waardeBlauweEi = 10;
+        waardeGoudenEi = 2;
+    }
+
+    public void eggValueSwitch(){
+        int tijdelijkeWaardeEi = waardeBlauweEi;
+        waardeBlauweEi = waardeGoudenEi;
+        waardeGoudenEi = tijdelijkeWaardeEi;
+
     }
 
     public void act() {
-        mazeSolver();
+        layTrailOfEggs(11);
     }
 
     /**
@@ -270,7 +282,93 @@ public class MyDodo extends Dodo
                 }
             }
         }
-        showCompliment("gg maze done!");
+        showCompliment("good job, maze done!");
+    }
+
+    public void faceEast(){
+        while (getDirection() != EAST){
+            setDirection(EAST);
+        }
+    }
+
+    public boolean validCoordinates(int x, int y){
+        if (x < getWorld().getWidth() && y < getWorld().getHeight())
+            return true;
+        else {
+            return false;
+        }
+    }
+
+    public boolean locationReached(int x, int y)
+    {
+        return getX() == x && getY() == y;
+    }
+
+    public void goToLocation(int coordX, int coordY)
+    {
+        if (validCoordinates(coordX, coordY))
+        {
+
+            while (!locationReached(coordX, coordY))
+            {
+                if (getX() < coordX)
+                {
+                    setDirection(EAST);
+                    move();
+                }
+                else if (getX() > coordX)
+                {
+                    setDirection(WEST);
+                    move();
+                }
+                else if (getY() < coordY)
+                {
+                    setDirection(SOUTH);
+                    move();
+                }
+                else if (getY() > coordY)
+                {
+                    setDirection(NORTH);
+                    move();
+                }
+            }
+        }
+    }
+
+    public int countEggsInRow(){
+        int eggCounter = 0;
+        if(onEgg()){
+            eggCounter++;
+        }
+
+        while (!borderAhead()){
+            move();
+            if (onEgg()){
+                eggCounter++;
+            }
+        }
+        goBackToStartOfRowAndFaceBack();
+        showCompliment("aantal eieren in rij: " + eggCounter);
+        return eggCounter;
+    }
+
+    public void layTrailOfEggs(int n) {
+        int eggsLaid = 0;
+
+        if (n > getWorld().getWidth() || borderAhead()){
+            showError("Too much egg for this world.");
+        }
+        else {
+            while(eggsLaid < n && !borderAhead()) {
+                if (canLayEgg()) {
+                    layEgg();
+                    eggsLaid++;
+                }
+                if (eggsLaid < n) {
+                    move();
+                }
+            }
+        }
     }
 }
 
