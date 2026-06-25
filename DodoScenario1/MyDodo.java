@@ -11,6 +11,7 @@ public class MyDodo extends Dodo
     private int myNrOfEggsHatched;
     private int waardeBlauweEi;
     private int waardeGoudenEi;
+    private boolean countedEggs;
 
     public MyDodo() {
         super( EAST );
@@ -27,7 +28,7 @@ public class MyDodo extends Dodo
     }
 
     public void act() {
-        layTrailOfEggs(11);
+        stevigMonument();
     }
 
     /**
@@ -348,7 +349,6 @@ public class MyDodo extends Dodo
             }
         }
         goBackToStartOfRowAndFaceBack();
-        showCompliment("aantal eieren in rij: " + eggCounter);
         return eggCounter;
     }
 
@@ -369,6 +369,94 @@ public class MyDodo extends Dodo
                 }
             }
         }
+    }
+
+    public void countEggsInWorld(){
+        int startX = getX();
+        int startY = getY();
+
+        int totalEggs = 0;
+        int rowMostEggs = 0;
+        int currentRowMostEggs = 0;
+
+        if (countedEggs){
+            return;
+        }
+
+        if (startY > 0){
+            goToLocation(0, 0);
+        }
+        for (int row = 0; row < getWorld().getHeight(); row++){
+            goToLocation(0, row);
+            setDirection(EAST);
+            int eggsInRow = countEggsInRow();
+            totalEggs = totalEggs + eggsInRow;
+            System.out.println("Total eggs in world: " + totalEggs);
+            if (eggsInRow > rowMostEggs){
+                rowMostEggs = eggsInRow;
+                currentRowMostEggs = row;
+            }
+        }
+        goToLocation(startX, startY);
+        setDirection(EAST);
+        System.out.println("highest eggs in row: " + currentRowMostEggs);
+
+        countedEggs = true;
+    }
+
+    public void monumentOfEggs() {
+        int startX = getX();
+        int startY = getY();
+
+        for (int row = 0; row < getWorld().getHeight(); row++) {
+            for (int column = 0; column <= row; column++) {
+                int x = startX + column;
+                int y = startY + row;
+
+                if (validCoordinates(x, y)) {
+                    if (canLayEgg()) {
+                        layEgg();
+                    }
+                    if (column < row) {
+                        setDirection(EAST);
+                        move();
+                    }
+                }
+            }
+            if (validCoordinates(startX, startY + row + 1)) {
+                goToLocation(startX, startY + row + 1);
+            }
+        }
+        goToLocation(startX, startY);
+        setDirection(EAST);
+    }
+
+    public void stevigMonument(){
+        int startX = getX();
+        int startY = getY();
+        int eggsInRow = 1; 
+        for (int row = 0; row < getWorld().getHeight(); row ++) {
+            for (int column = 0; column < eggsInRow; column++) {
+                int x = startX + column;
+                int y = startY + row;
+
+                if (!borderAhead() || validCoordinates(x, y)) {
+                    if (canLayEgg()) {
+                        layEgg();
+                    }
+                    if (column < eggsInRow) {
+                        setDirection(EAST);
+                        move();
+                    }
+                }
+            }
+            eggsInRow *= 2;
+            if (validCoordinates(startX, startY + row + 1)) {
+                goToLocation(startX, startY + row + 1);
+            }
+        }
+        goToLocation(startX, startY);
+        setDirection(EAST);
     }
 }
 
