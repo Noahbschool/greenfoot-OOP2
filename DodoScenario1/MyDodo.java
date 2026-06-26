@@ -1,5 +1,6 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.util.Scanner;
+import java.util.List;
 
 /**
  *
@@ -12,6 +13,7 @@ public class MyDodo extends Dodo
     private int waardeBlauweEi;
     private int waardeGoudenEi;
     private boolean countedEggs;
+    private int myNrOfStepsTaken = 0;
 
     public MyDodo() {
         super( EAST );
@@ -28,7 +30,7 @@ public class MyDodo extends Dodo
     }
 
     public void act() {
-        parasietbit();
+        moveToNearestEggInList();
     }
 
     /**
@@ -562,5 +564,71 @@ public class MyDodo extends Dodo
         goToLocation(startX, startY);
         setDirection(EAST);
     }
+
+    public void getScore(int score1, int score2){
+        Mauritius world = (Mauritius) getWorld();
+        world.updateScore(score1, score2);
+    }
+
+    public void moveRandomly() {
+        while (myNrOfStepsTaken < Mauritius.MAXSTEPS){
+            int direction = randomDirection();
+
+            if (direction == 0){
+                turnLeft();
+            } else if (direction == 1) {
+                turnRight();
+            } else if (direction == 2) {
+                turnLeft();
+                turnLeft();
+            }
+            if (!borderAhead() && !fenceAhead()) {
+                move();
+                myNrOfStepsTaken++;
+                getScore(Mauritius.MAXSTEPS - myNrOfStepsTaken , 0);
+            }
+        }
+    }
+    
+    public void moveToNearestEggInList(){
+        List<Egg> eggs = (List<Egg>) getWorld().getObjects(Egg.class);
+        
+        if (eggs.isEmpty()){
+            return;
+        }
+        
+        Egg nearestEgg = eggs.get(0);
+        int shortestDistance = Math.abs(nearestEgg.getX() - getX()) + Math.abs(nearestEgg.getY() - getY());
+        
+        for (int i = 1; i < eggs.size(); i++){
+            Egg egg = eggs.get(1);
+            int distance = Math.abs(egg.getX() - getX()) + Math.abs(egg.getY() - getY());
+            
+            if (distance < shortestDistance) {
+                shortestDistance = distance;
+                nearestEgg = egg;
+            }
+        }
+        while (!onEgg()){
+            int x = nearestEgg.getX() - getX();
+            int y = nearestEgg.getY() - getY();
+            
+            if (x > 0) {
+                setDirection(EAST);
+            } else if (x < 0) {
+                setDirection(WEST);
+            } else if (y > 0){
+                setDirection(SOUTH);
+            } else if (y < 0 ) {
+                setDirection(NORTH);
+            }
+            
+            step();
+        }
+        if (onEgg()) {
+            pickUpEgg();
+        }
+    }
+
 }
 
