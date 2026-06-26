@@ -697,7 +697,7 @@ public class MyDodo extends Dodo
         }
         pickUpEgg();
         myPoints += targetEgg.getValue();
-        System.out.println("PointsL " + myPoints);
+        System.out.println("Points: " + myPoints);
         getScore(Mauritius.MAXSTEPS - myNrOfStepsTaken, myPoints);
     }
 }
