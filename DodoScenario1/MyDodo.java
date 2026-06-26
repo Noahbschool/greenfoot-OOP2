@@ -28,7 +28,7 @@ public class MyDodo extends Dodo
     }
 
     public void act() {
-        gemiddeldeEierenPerRij();
+        parasietbit();
     }
 
     /**
@@ -336,17 +336,13 @@ public class MyDodo extends Dodo
         }
     }
 
-    public int countEggsInRow(){
+    public int countEggsInRow() {
         int eggCounter = 0;
-        if(onEgg()){
-            eggCounter++;
-        }
-
-        while (!borderAhead()){
+        if (onEgg()) eggCounter++;
+        while (!borderAhead()) {
             move();
-            if (onEgg()){
-                eggCounter++;
-            }
+            if (borderAhead()) break;
+            if (onEgg()) eggCounter++;
         }
         goBackToStartOfRowAndFaceBack();
         return eggCounter;
@@ -499,6 +495,72 @@ public class MyDodo extends Dodo
 
         System.out.println("Gemiddelde eieren per rij: " + average);
         return average;
+    }
+
+    public int getIncorrectRowNr() {
+        for (int row = 0; row < getWorld().getHeight(); row++) {
+            goToLocation(0, row);
+            setDirection(EAST);
+            if (countEggsInRow() % 2 != 0) return row;
+        }
+        return -1;
+    }
+
+    public int countEggsInColumn() {
+        int eggCounter = 0;
+        if (onEgg()) eggCounter++;
+        while (!borderAhead()) {
+            move();
+            if (borderAhead()) break;
+            if (onEgg()) eggCounter++;
+        }
+        turn180();
+        walkToWorldEdge();
+        turn180();
+        return eggCounter;
+    }
+
+    public int getIncorrectColumnNr() {
+        for (int column = 0; column < getWorld().getWidth(); column++) {
+            goToLocation(column, 0);
+            setDirection(SOUTH);
+            if (countEggsInColumn() % 2 != 0) return column;
+        }
+        return -1;
+    }
+
+    public void gotoIncorrectBit(int row, int column) {
+        goToLocation(column, row);
+    }
+
+    public void fixIncorrectBit() {
+        if (onEgg()) {
+            pickUpEgg();
+        } else {
+            layEgg();
+        }
+    }
+
+    public void parasietbit() {
+        int startX = getX();
+        int startY = getY();
+
+        int incorrectRow = getIncorrectRowNr();
+        int incorrectColumn = getIncorrectColumnNr();
+
+        while (incorrectRow != -1 && incorrectColumn != -1) {
+            gotoIncorrectBit(incorrectRow, incorrectColumn);
+            fixIncorrectBit();
+            incorrectRow = getIncorrectRowNr();
+            incorrectColumn = getIncorrectColumnNr();
+        }
+
+        if (incorrectRow == -1 && incorrectColumn == -1) {
+            System.out.println("wereld is niet beschadigd");
+        }
+
+        goToLocation(startX, startY);
+        setDirection(EAST);
     }
 }
 
