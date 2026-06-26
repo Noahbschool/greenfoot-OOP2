@@ -28,7 +28,7 @@ public class MyDodo extends Dodo
     }
 
     public void act() {
-        stevigMonument();
+        gemiddeldeEierenPerRij();
     }
 
     /**
@@ -457,6 +457,48 @@ public class MyDodo extends Dodo
         }
         goToLocation(startX, startY);
         setDirection(EAST);
+    }
+
+    public void piramideMonument(){
+        int startX = getX();
+        int startY = getY();
+        for (int row = 0; row < getWorld().getHeight(); row++) {
+            int eggsInRow = 2 * row + 1;
+            int rowStartX = startX - row;
+            for (int column = 0; column < eggsInRow; column++) {
+                int x = rowStartX + column;
+                int y = startY + row;
+                if (validCoordinates(x, y)) {
+                    goToLocation(x, y);
+                    if (canLayEgg()) {
+                        layEgg();
+                    }
+                }
+            }
+        }
+        goToLocation(startX, startY);
+        setDirection(EAST);
+    }
+
+    public double gemiddeldeEierenPerRij() {
+        int totalEggs = 0;
+        int totalRows = getWorld().getHeight();
+
+        for (int row = 0; row < totalRows; row++) {
+            for (int column = 0; column < getWorld().getWidth(); column++) {
+                if (validCoordinates(column, row)) {
+                    goToLocation(column, row);
+                    if (onEgg()) {
+                        totalEggs++;
+                    }
+                }
+            }
+        }
+
+        double average = (double) totalEggs/totalRows;
+
+        System.out.println("Gemiddelde eieren per rij: " + average);
+        return average;
     }
 }
 
