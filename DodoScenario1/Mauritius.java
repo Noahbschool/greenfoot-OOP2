@@ -16,7 +16,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class Mauritius extends World
 {
-    private static final String WORLD_NAME = "worldEmpty.txt";
+    private static final String WORLD_NAME = "worldDodoRace4.txt";
     private static File WORLD_FILE = null;
 
     private static final int MAXWIDTH = 100, MAXHEIGHT = 100, CELLSIZE = 60;
@@ -65,6 +65,7 @@ public class Mauritius extends World
         setPaintOrder (Message.class, Scoreboard.class, Dodo.class, Grain.class,
                        Nest.class, Egg.class, Fence.class);        
         populate();
+        addObject(theScoreboard, 4, 0);
     }
 
     public static void traceOn() {

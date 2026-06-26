@@ -14,6 +14,7 @@ public class MyDodo extends Dodo
     private int waardeGoudenEi;
     private boolean countedEggs;
     private int myNrOfStepsTaken = 0;
+    private int myPoints = 0;
 
     public MyDodo() {
         super( EAST );
@@ -30,7 +31,7 @@ public class MyDodo extends Dodo
     }
 
     public void act() {
-        moveToNearestEggInList();
+        actSmart();
     }
 
     /**
@@ -589,21 +590,21 @@ public class MyDodo extends Dodo
             }
         }
     }
-    
+
     public void moveToNearestEggInList(){
         List<Egg> eggs = (List<Egg>) getWorld().getObjects(Egg.class);
-        
+
         if (eggs.isEmpty()){
             return;
         }
-        
+
         Egg nearestEgg = eggs.get(0);
         int shortestDistance = Math.abs(nearestEgg.getX() - getX()) + Math.abs(nearestEgg.getY() - getY());
-        
+
         for (int i = 1; i < eggs.size(); i++){
             Egg egg = eggs.get(1);
             int distance = Math.abs(egg.getX() - getX()) + Math.abs(egg.getY() - getY());
-            
+
             if (distance < shortestDistance) {
                 shortestDistance = distance;
                 nearestEgg = egg;
@@ -612,7 +613,7 @@ public class MyDodo extends Dodo
         while (!onEgg()){
             int x = nearestEgg.getX() - getX();
             int y = nearestEgg.getY() - getY();
-            
+
             if (x > 0) {
                 setDirection(EAST);
             } else if (x < 0) {
@@ -622,7 +623,7 @@ public class MyDodo extends Dodo
             } else if (y < 0 ) {
                 setDirection(NORTH);
             }
-            
+
             step();
         }
         if (onEgg()) {
@@ -630,5 +631,74 @@ public class MyDodo extends Dodo
         }
     }
 
+    public void actSmart() {
+
+        while (myNrOfStepsTaken < Mauritius.MAXSTEPS) {
+            List<Egg> eggs = (List<Egg>) getWorld().getObjects(Egg.class);
+            if (eggs.isEmpty()){
+                break;
+            }
+
+            Egg bestEgg = getBestEgg(eggs);
+            int distance = Math.abs(bestEgg.getX() - getX()) + Math.abs(bestEgg.getY() - getY());
+
+            if (myNrOfStepsTaken + distance > Mauritius.MAXSTEPS) {
+                break;
+            }
+
+            moveToSpecificEgg(bestEgg);
+        }
+    }
+
+    private Egg getBestEgg(List<Egg> eggs) {
+        Egg bestEgg = eggs.get(0);
+        int firstDistance = Math.abs(bestEgg.getX() - getX()) + Math.abs(bestEgg.getY() - getY());
+        if (firstDistance == 0){
+            firstDistance = 1;
+        }
+        double bestRatio = (double) bestEgg.getValue() / firstDistance;
+
+        for (int i = 1; i < eggs.size(); i++) {
+            Egg egg = eggs.get(i);
+            int distance = Math.abs(egg.getX() - getX()) + Math.abs(egg.getY() - getY());
+            if (distance == 0) distance = 1;
+            double ratio = (double) egg.getValue() / distance;
+
+            if (ratio > bestRatio) {
+                bestRatio = ratio;
+                bestEgg = egg;
+            }
+        }
+        return bestEgg;
+    }
+
+    private void moveToSpecificEgg(Egg targetEgg) {
+        while (!onEgg()) {
+            if (myNrOfStepsTaken >= Mauritius.MAXSTEPS){
+                return;
+            }
+
+            int x = targetEgg.getX() - getX();
+            int y = targetEgg.getY() - getY();
+
+            if (x > 0) {
+                setDirection(EAST);
+            } else if (x < 0) {
+                setDirection(WEST);
+            } else if (y > 0){
+                setDirection(SOUTH);
+            } else if (y < 0 ) {
+                setDirection(NORTH);
+            }
+
+            move();
+            myNrOfStepsTaken++;
+            getScore(Mauritius.MAXSTEPS - myNrOfStepsTaken, 0);
+        }
+        pickUpEgg();
+        myPoints += targetEgg.getValue();
+        System.out.println("PointsL " + myPoints);
+        getScore(Mauritius.MAXSTEPS - myNrOfStepsTaken, myPoints);
+    }
 }
 
